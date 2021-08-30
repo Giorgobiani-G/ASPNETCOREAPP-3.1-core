@@ -1,0 +1,109 @@
+﻿@model ApplicationUserc
+@{
+    ViewData["Title"] = "Registration";
+}
+
+<head>
+    <style>
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+
+</head>
+
+<h2>Registration</h2>
+
+
+
+
+<div class="row">
+    <form method="post" class="form-horizontal" role="form">
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+
+        <div class="form-group">
+            <label asp-for="UserName" class="col-sm-3 control-label">UserId</label>
+            <div class="col-sm-12">
+                <input asp-for="UserName" type="number" id="firstName" placeholder="UserId" class="form-control" autofocus>
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Name" class="col-sm-3 control-label">Name</label>
+            <div class="col-sm-12">
+                <input asp-for="Name" id="idnumber" placeholder="Name" class="form-control" autofocus>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label asp-for="Surname" class="col-sm-3 control-label">Last Name</label>
+            <div class="col-sm-12">
+                <input asp-for="Surname" type="text" id="lastName" placeholder="Last Name" class="form-control" autofocus>
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Gender" class="col-sm-3 control-label">Gender</label>
+
+            <div class="col-sm-12">
+                <select asp-for="Gender" name="gender" id="gender" class="form-control">
+                    <option value="Male" selected>Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DateofBirth" class="col-sm-3 control-label">Date of Birth</label>
+            <div class="col-sm-12">
+                <input asp-for="DateofBirth" type="date" id="birthDate" class="form-control">
+                <span asp-validation-for="DateofBirth" class="text-danger"></span>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label asp-for="Email" class="col-sm-3 control-label">Email</label>
+            <div class="col-sm-12">
+                <input asp-for="Email" type="email" id="email" placeholder="Email" class="form-control" name="email">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password" class="col-sm-3 control-label">Password</label>
+            <div class="col-sm-12">
+                <input asp-for="Password" type="Password" id="password" placeholder="Password" class="form-control" name="Password">
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="ConfirmPassword" class="col-sm-3 control-label">Confirm Password</label>
+            <div class="col-sm-12">
+                <input asp-for="ConfirmPassword" type="password" id="Confirmpassword" placeholder="Password" class="form-control">
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+        </div>
+
+
+
+
+
+
+        <button type="submit" class="btn btn-primary btn-block">Register</button>
+    </form> <!-- /form -->
+</div> <!-- ./container -->

@@ -1,0 +1,88 @@
+﻿@model Listmodel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+
+<form enctype="multipart/form-data" asp-controller="home" asp-action="index"
+      method="post" class="mt-3">
+    <div class="form-group row">
+        <label asp-for="Name" class="col-sm-1 col-form-label"></label>
+        <div class="col-sm-5">
+            <input asp-for="Name" class="form-control" placeholder="Name">
+
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label asp-for="Photo" class="col-sm-1 col-form-label"></label>
+        <div class="col-sm-5">
+            <div class="custom-file">
+                <input asp-for="Photo" class="form-control custom-file-input">
+                <label class="custom-file-label">Choose File...</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <script>
+        $(document).ready(function () {
+            $('.custom-file-input').on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            });
+        });
+    </script>
+
+</form>
+
+
+
+@inject DatabaseContext db;
+
+@foreach (var lst in db.Listmodels)
+{
+    var path = "~/images/" + lst.Photopath;
+
+    string strurl = lst.Photopath;
+
+    <form enctype="multipart/form-data" asp-controller="Home" asp-action="Delete" method="post" class="d-inline-block  m-3 text-center">
+        
+            <div class="form-group">
+                <input type="hidden" value="@lst.ImageId" asp-for="ImageId" />
+                <img src="@path" asp-append-version="true" class="imageThumbnail" />
+
+            </div>
+
+            <div class="form-group">
+                <p>@lst.Name </p>
+            </div>
+
+
+
+            <div class="form-group">
+
+                <input class="btn-danger" value="Delete"
+                       type="submit" onclick="return confirm('Are you sure you want to delete record with ID = @lst.ImageId' );" />
+
+            </div>
+
+        
+
+
+
+
+    </form>
+}

@@ -1,0 +1,134 @@
+﻿@model ASPNETCOREAPP.Models.EmploeeModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<head>
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+
+    @if (ViewBag.Message != null)
+        {
+
+        <script type="text/javascript">
+                $(document).ready(
+                   function () {
+                       alert("@ViewBag.Message");
+                       $('input[class="form-control"]').each(function () {
+                           $(this).val("")
+
+                       });
+                       $('select').each(function () {
+                           $(this).val($(this).find("option[selected]").val())
+                       })
+                });
+
+        </script>
+        }
+
+
+
+
+</head>
+<h1>Create</h1>
+
+
+
+
+<h4>EmploeeModel</h4>
+<style>
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+
+
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" id="fo">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Empid" class="control-label"></label>
+                <input type="number" asp-for="Empid" class="form-control" />
+                <span asp-validation-for="Empid" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Surname" class="control-label"></label>
+                <input asp-for="Surname" class="form-control" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Gender" class="control-label"></label>
+
+                <select asp-for="Gender" class="form-control">
+                    <option  value="male" selected="selected">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateofBirth" class="control-label"></label>
+                <input asp-for="DateofBirth" class="form-control" />
+                <span asp-validation-for="DateofBirth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label">Email </label>
+                <input asp-for="Email" class="form-control">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Posti" class="control-label"></label>
+                <input asp-for="Posti" class="form-control" />
+                <span asp-validation-for="Posti" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Statusi" class="control-label"></label>
+                <select asp-for="Statusi" class="form-control">
+                    <option value="Shtatshia" selected="selected">Shtatshia</option>
+                    <option value="Shtatgaresje">Shtatgaresje</option>
+                    <option value="Gantavisuflebuli">Gantavisuflebuli</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateofFire" class="control-label"></label>
+                <input asp-for="DateofFire" class="form-control" />
+                <span asp-validation-for="DateofFire" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input id="but" type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+
+
+    </div>
+</div>
+
+
+
+
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
