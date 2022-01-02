@@ -65,7 +65,7 @@ namespace ASPNETCOREAPP.Controllers
                     smtp.Port = 587;
                     smtp.UseDefaultCredentials = false;
                     smtp.EnableSsl = true;
-                    smtp.Credentials = new System.Net.NetworkCredential("mailforbusiness86@gmail.com", "giorgobiani1986");
+                    smtp.Credentials = new System.Net.NetworkCredential("mailforbusiness86@gmail.com", "Karagandu@1986");
                     smtp.Send(mm);
                     ViewBag.message = "mail has been sent to " + mm.To + " succesfully";
 
