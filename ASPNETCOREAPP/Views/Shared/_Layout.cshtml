@@ -44,22 +44,30 @@
                                     <li class="nav-item">
                                         <a class="nav-link text-white" asp-area="" asp-action="index" asp-controller="EmploeeModels">Home</a>
                                     </li>
+                            if (User.IsInRole("Admin"))
+                            {
+                                                        <li class="nav-item">
+                                                            <a class="nav-link text-white" asp-action="ListRoles" asp-controller="Administration">Manage Roles</a>
+                                                        </li>
 
-                                                    <li class="nav-item ml-auto">
-                                                        <form method="post" asp-action="logout" asp-controller="Login">
-                                                            <button type="submit" class="nav-link btn btn-link text-white">Logout @UserManager.GetUserAsync(User).Result.Name </button>
-                                                        </form>
-                                                    </li> }
+                                                    }
 
-                                                                else
-                                                                {
-                                                    <li class="nav-item ml-auto" >
-                                                        <a class="nav-link text-white" asp-area="" asp-controller="Register" asp-action="Register">Register</a>
+
+                                    <li class="nav-item ml-auto">
+                                        <form method="post" asp-action="logout" asp-controller="Login">
+                                            <button type="submit" class="nav-link btn btn-link text-white">Logout @UserManager.GetUserAsync(User).Result.Name </button>
+                                        </form>
+                                    </li> }
+
+                                                else
+                                                {
+                                    <li class="nav-item ml-auto">
+                                        <a class="nav-link text-white" asp-area="" asp-controller="Register" asp-action="Register">Register</a>
+                                    </li>
+                                                    <li class="nav-item ">
+                                                        <a class="nav-link text-white" asp-area="" asp-controller="Login" asp-action="Login">Login</a>
                                                     </li>
-                                                                    <li class="nav-item ">
-                                                                        <a class="nav-link text-white" asp-area="" asp-controller="Login" asp-action="Login">Login</a>
-                                                                    </li>
-                                                                    }
+}
                     </ul>
                 </div>
             </div>

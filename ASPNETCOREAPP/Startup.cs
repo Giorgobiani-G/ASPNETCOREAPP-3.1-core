@@ -48,8 +48,13 @@ namespace WebApplication1
 
             
             services.AddRazorPages().AddMvcOptions(opt => opt.EnableEndpointRouting = false);
-        
-            }
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.AccessDeniedPath = new PathString("/Login/AccessDenied");
+            });
+
+        }
 
 
 

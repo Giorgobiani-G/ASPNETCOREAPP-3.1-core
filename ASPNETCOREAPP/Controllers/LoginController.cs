@@ -1,5 +1,6 @@
 ﻿using ASPNETCOREAPP.Models;
 using ASPNETCOREAPP.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,8 +14,7 @@ namespace ASPNETCOREAPP.Controllers
 {
     public class LoginController : Controller
     {
-        
-        DatabaseContext db;
+        private readonly DatabaseContext db;
 
         
         public IActionResult Mail ()
@@ -85,24 +85,7 @@ namespace ASPNETCOREAPP.Controllers
 
                     if (result.Succeeded)
                     {
-                        //string to = user.Email;
                        
-                        //MailMessage mm = new MailMessage();
-                        //mm.To.Add(to);
-                        //mm.Body = "Login";
-                        //mm.Subject = "congrats";
-                        //mm.From = new MailAddress("mailforbusiness86@gmail.com");
-                        //mm.IsBodyHtml = false;
-                        //SmtpClient smtp = new SmtpClient("smtp.gmail.com");
-                        //smtp.Port = 587;
-                        //smtp.UseDefaultCredentials = false;
-                        //smtp.EnableSsl = true;
-                        //smtp.Credentials = new System.Net.NetworkCredential("mailforbusiness86@gmail.com", "giorgobiani1986");
-                        //smtp.Send(mm);
-                        //ViewBag.message = "mail has been sent to " + mm.To + " succesfully";
-
-
-
                         return RedirectToAction("Index", "Home");
                     }
 
@@ -112,16 +95,17 @@ namespace ASPNETCOREAPP.Controllers
                     // the user is not exist
                 }
             
-
-               
-
-
-
-
                 ModelState.AddModelError(string.Empty, "Invalid Email Or Password");
             }
 
             return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }
