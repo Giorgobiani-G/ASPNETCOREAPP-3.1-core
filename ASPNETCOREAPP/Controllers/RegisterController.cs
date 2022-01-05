@@ -50,6 +50,11 @@ namespace ASPNETCOREAPP.Controllers
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    if (signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                    {
+                        return RedirectToAction("ListUsers", "Administration");
+                    }
+
                     await userManager.AddClaimAsync(user, new Claim("Name", user.Name));
                     await signInManager.SignInAsync(user, isPersistent: false);
 
@@ -68,6 +73,8 @@ namespace ASPNETCOREAPP.Controllers
                     smtp.Credentials = new System.Net.NetworkCredential("mailforbusiness86@gmail.com", "Karagandu@1986");
                     smtp.Send(mm);
                     ViewBag.message = "mail has been sent to " + mm.To + " succesfully";
+
+                 
 
 
 
