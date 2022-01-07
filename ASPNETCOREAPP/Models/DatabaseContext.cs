@@ -26,8 +26,15 @@ namespace ASPNETCOREAPP.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            foreach (var foreignkey in builder.Model.GetEntityTypes().SelectMany(e=> e.GetForeignKeys()))
+            {
+                foreignkey.DeleteBehavior = DeleteBehavior.Restrict;
+            }
            
         }
+
+
 
         
     }
