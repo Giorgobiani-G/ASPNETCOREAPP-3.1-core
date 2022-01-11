@@ -15,36 +15,26 @@ namespace ASPNETCOREAPP.Controllers
     public class LoginController : Controller
     {
         private readonly DatabaseContext db;
+        private readonly SignInManager<ApplicationUserc> signInManager;
+        private readonly UserManager<ApplicationUserc> userManager;
 
-        
         public IActionResult Mail ()
         {
-            //string to = email.To;
-            //string subject = email.Subject;
-            //string body = email.Body;
-            //MailMessage mm = new MailMessage();
-            //mm.To.Add(to);
-            //mm.Body = "Login";
-            //mm.Subject = "congrats";
-            //mm.From = new MailAddress("mailforbusiness86@gmail.com");
-            //mm.IsBodyHtml = false;
-            //SmtpClient smtp = new SmtpClient("smtp.gmail.com");
-            //smtp.Port = 587;
-            //smtp.UseDefaultCredentials = true;
-            //smtp.EnableSsl = true;
-            //smtp.Credentials = new System.Net.NetworkCredential("mailforbusiness86@gmail.com", "giorgobiani1986");
-            //smtp.Send(mm);
-            ViewBag.message = "mail has been sent to " +  " succesfully";
-            
+
+            ViewBag.ErrorTitle = "Registration successful";
+            ViewBag.ErrorMessage = "Before you can Login, please confirm your " +
+                    "email, by clicking on the confirmation link we have emailed you";
+
             return View();
 
         }
 
-        private readonly SignInManager<ApplicationUserc> signInManager;
-        public LoginController(SignInManager<ApplicationUserc> signInManager, DatabaseContext ddb)
+        
+        public LoginController(SignInManager<ApplicationUserc> signInManager, DatabaseContext ddb,UserManager<ApplicationUserc> userManager)
         {
             this.signInManager = signInManager;
             db = ddb;
+            this.userManager = userManager;
            
         }
 
@@ -73,12 +63,20 @@ namespace ASPNETCOREAPP.Controllers
 
                     
                     var user = (from users in db.Users
-                                where users.Email == model.Email
+                                where users.Email == model.Email&& users.Password == model.Password
                                 select users).FirstOrDefault();
 
                     if (user == null)
                     {
-                        throw new Exception("invalid user or password");
+                        ModelState.AddModelError("", "Invalid Mail Or Password");
+                        return View(model) ;
+                    }
+
+                    if (user!=null&&!user.EmailConfirmed&&(await userManager.CheckPasswordAsync(user,model.Password)))
+                    {
+                        ModelState.AddModelError(string.Empty, "Email not confirmed yet");
+                        return View(model);
+
                     }
                     
                     var result = await signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
@@ -95,7 +93,7 @@ namespace ASPNETCOREAPP.Controllers
                     // the user is not exist
                 }
             
-                ModelState.AddModelError(string.Empty, "Invalid Email Or Password");
+                
             }
 
             return View(model);
