@@ -6,18 +6,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ASPNETCOREAPP.Models;
-
-
+using Microsoft.AspNetCore.DataProtection;
+using ASPNETCOREAPP.Security;
 
 namespace ASPNETCOREAPP.Controllers
 {
     public class EmploeeModelsController : Controller
     {
         private readonly DatabaseContext _context;
-
-        public EmploeeModelsController(DatabaseContext context)
+        private readonly IDataProtector protector;
+        public EmploeeModelsController(DatabaseContext context,
+            IDataProtectionProvider dataProtectionProvider,
+            DataProtectionPurposeStrings dataProtectionPurposeStrings)
         {
+
             _context = context;
+            protector = dataProtectionProvider.CreateProtector(dataProtectionPurposeStrings.EmployeeIdRouteValue);
         }
         
 
@@ -26,6 +30,11 @@ namespace ASPNETCOREAPP.Controllers
         {
             var Emploees = from em in _context.Emploees
                        select em;
+
+            foreach (var item in Emploees)
+            {
+                item.EncryptedId = protector.Protect(item.Id.ToString());
+            }
 
             if (!String.IsNullOrEmpty(SearchText))
             {
@@ -53,7 +62,7 @@ namespace ASPNETCOREAPP.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Empid,Name,Surname,Gender,DateofBirth,Email,Posti,Statusi,DateofFire")] EmploeeModel emploeeModel)
+        public async Task<IActionResult> Create(EmploeeModel emploeeModel)
         {
             
             if (ModelState.IsValid)
@@ -99,19 +108,38 @@ namespace ASPNETCOREAPP.Controllers
 
         // GET: EmploeeModels/Edit/5
         [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
+            string decryptedId = protector.Unprotect(id);
+            int decryptedIntId = Convert.ToInt32(decryptedId);
+            
 
-            var emploeeModel = await _context.Emploees.FindAsync(id);
+            var emploeeModel = await _context.Emploees.FindAsync(decryptedIntId);
             if (emploeeModel == null)
             {
                 return NotFound();
             }
-            return View(emploeeModel);
+
+            EmploeeModel emploeeModela = new EmploeeModel
+            {
+                Email = emploeeModel.Email,
+                EncryptedId = id,
+                DateofBirth = emploeeModel.DateofBirth,
+                Gender = emploeeModel.Gender,
+                Id = decryptedIntId,
+                Statusi = emploeeModel.Statusi,
+                Surname = emploeeModel.Surname,
+                Empid = emploeeModel.Empid,
+                DateofFire = emploeeModel.DateofFire,
+                Name = emploeeModel.Name,
+                Posti = emploeeModel.Posti
+            };
+
+            return View(emploeeModela);
         }
 
         // POST: EmploeeModels/Edit/5
@@ -120,24 +148,26 @@ namespace ASPNETCOREAPP.Controllers
         
         [HttpPost]
         
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Empid,Name,Surname,Gender,DateofBirth,Email,Posti,Statusi,DateofFire")] EmploeeModel emploeeModel)
+        public async Task<IActionResult> Edit(EmploeeModel emploeeModel)
         {
-            if (id != emploeeModel.Id)
+            if (emploeeModel.EncryptedId==null)
             {
                 return NotFound();
             }
+            string decryptedId = protector.Unprotect(emploeeModel.EncryptedId);
+            int decryptedIntId = Convert.ToInt32(decryptedId);
 
-            if (ModelState.IsValid)
+           if (ModelState.IsValid)
             {
                 try
                 {
                     var checkmail = (from email in _context.Emploees
-                                      where email.Email == emploeeModel.Email&& email.Id!=emploeeModel.Id
-                                      select email).Any();
+                                      where email.Email == emploeeModel.Email&& email.Id!= decryptedIntId
+                                     select email).Any();
 
 
                     var checkid = (from aidi in _context.Emploees
-                                   where aidi.Empid == emploeeModel.Empid && aidi.Id != emploeeModel.Id
+                                   where aidi.Empid == emploeeModel.Empid && aidi.Id != decryptedIntId
                                    select aidi).Any();
 
                     if (checkid&& checkmail)
@@ -166,7 +196,7 @@ namespace ASPNETCOREAPP.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EmploeeModelExists(emploeeModel.Id))
+                    if (!EmploeeModelExists(decryptedIntId))
                     {
                         return NotFound();
                     }
@@ -181,15 +211,18 @@ namespace ASPNETCOREAPP.Controllers
         }
 
         // GET: EmploeeModels/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
+            string decryptedId = protector.Unprotect(id);
+            int decryptedIntId = Convert.ToInt32(decryptedId);
+
 
             var emploeeModel = await _context.Emploees
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Id == decryptedIntId);
             if (emploeeModel == null)
             {
                 return NotFound();
@@ -201,9 +234,12 @@ namespace ASPNETCOREAPP.Controllers
         // POST: EmploeeModels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var emploeeModel = await _context.Emploees.FindAsync(id);
+            string decryptedId = protector.Unprotect(id);
+            int decryptedIntId = Convert.ToInt32(decryptedId);
+
+            var emploeeModel = await _context.Emploees.FindAsync(decryptedIntId);
             _context.Emploees.Remove(emploeeModel);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

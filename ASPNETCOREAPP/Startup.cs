@@ -1,4 +1,5 @@
 ﻿using ASPNETCOREAPP.Models;
+using ASPNETCOREAPP.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace WebApplication1
 {
@@ -54,6 +56,7 @@ namespace WebApplication1
                 options.AccessDeniedPath = new PathString("/Login/AccessDenied");
             });
 
+            services.AddSingleton<DataProtectionPurposeStrings>();
         }
 
 
