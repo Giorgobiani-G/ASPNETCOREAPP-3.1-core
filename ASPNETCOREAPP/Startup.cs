@@ -4,30 +4,26 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 
 namespace WebApplication1
 {
     public class Startup
     {
-        private IConfiguration _Configuration;
+        private readonly IConfiguration _configuration;
         public Startup(IConfiguration configuration)
         {
-            _Configuration = configuration;
+            _configuration = configuration;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
             services.Configure<CookiePolicyOptions>(options =>
             {
-
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
@@ -35,20 +31,16 @@ namespace WebApplication1
             });
             
             services.AddDbContextPool<DatabaseContext>(options =>
-            options.UseSqlServer(_Configuration.GetConnectionString("EmployeeDBConnection")));
-
-            
+            options.UseSqlServer(_configuration.GetConnectionString("EmployeeDBConnection")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>(op=> { op.SignIn.RequireConfirmedEmail = true;}).AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders().AddErrorDescriber<CustomIdentityErrorDescriber>();
             
-            //Add Email uniqueness
             services.Configure<IdentityOptions>(options =>
             {
                 options.User.RequireUniqueEmail = true;
                 
             });
 
-            
             services.AddRazorPages().AddMvcOptions(opt => opt.EnableEndpointRouting = false);
 
             services.ConfigureApplicationCookie(options =>

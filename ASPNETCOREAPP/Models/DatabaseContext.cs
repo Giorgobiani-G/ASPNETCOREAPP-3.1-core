@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace ASPNETCOREAPP.Models
 {
     public class DatabaseContext : IdentityDbContext<ApplicationUser>
     {
-        //public DatabaseContext()
-        //{
-        //}
-
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options){}
 
         public DbSet<EmploeeModel> Emploees { get; set; }
