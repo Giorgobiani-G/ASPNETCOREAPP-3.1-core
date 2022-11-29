@@ -47,9 +47,6 @@ namespace ASPNETCOREAPP.Controllers
             return View();
         }
 
-        // POST: EmploeeModels/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(EmploeeModel employModel)
@@ -96,7 +93,6 @@ namespace ASPNETCOREAPP.Controllers
             
         }
 
-        // GET: EmploeeModels/Edit/5
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
@@ -104,29 +100,32 @@ namespace ASPNETCOREAPP.Controllers
             {
                 return NotFound();
             }
-            string decryptedId = _protector.Unprotect(id);
-            int decryptedIntId = Convert.ToInt32(decryptedId);
+
+            var decryptedId = _protector.Unprotect(id);
+
+            var decryptedIntId = Convert.ToInt32(decryptedId);
             
 
-            var emploeeModel = await _context.Emploees.FindAsync(decryptedIntId);
-            if (emploeeModel == null)
+            var employeeModel = await _context.Emploees.FindAsync(decryptedIntId);
+
+            if (employeeModel == null)
             {
                 return NotFound();
             }
 
-            EmploeeModel model = new EmploeeModel
+            var model = new EmploeeModel
             {
-                Email = emploeeModel.Email,
+                Email = employeeModel.Email,
                 EncryptedId = id,
-                DateofBirth = emploeeModel.DateofBirth,
-                Gender = emploeeModel.Gender,
+                DateofBirth = employeeModel.DateofBirth,
+                Gender = employeeModel.Gender,
                 Id = decryptedIntId,
-                Statusi = emploeeModel.Statusi,
-                Surname = emploeeModel.Surname,
-                Empid = emploeeModel.Empid,
-                DateofFire = emploeeModel.DateofFire,
-                Name = emploeeModel.Name,
-                Posti = emploeeModel.Posti
+                Statusi = employeeModel.Statusi,
+                Surname = employeeModel.Surname,
+                Empid = employeeModel.Empid,
+                DateofFire = employeeModel.DateofFire,
+                Name = employeeModel.Name,
+                Posti = employeeModel.Posti
             };
 
             return View(model);
@@ -140,8 +139,10 @@ namespace ASPNETCOREAPP.Controllers
             {
                 return NotFound();
             }
-            string decryptedId = _protector.Unprotect(employeeModel.EncryptedId);
-            int decryptedIntId = Convert.ToInt32(decryptedId);
+
+            var decryptedId = _protector.Unprotect(employeeModel.EncryptedId);
+
+            var decryptedIntId = Convert.ToInt32(decryptedId);
 
            if (ModelState.IsValid)
             {
@@ -216,12 +217,15 @@ namespace ASPNETCOREAPP.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            string decryptedId = _protector.Unprotect(id);
-            int decryptedIntId = Convert.ToInt32(decryptedId);
+            var decryptedId = _protector.Unprotect(id);
+
+            var decryptedIntId = Convert.ToInt32(decryptedId);
 
             var model = await _context.Emploees.FindAsync(decryptedIntId);
             _context.Emploees.Remove(model);
+
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 

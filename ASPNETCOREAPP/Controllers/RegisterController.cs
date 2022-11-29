@@ -47,12 +47,12 @@ namespace ASPNETCOREAPP.Controllers
                 if (result.Succeeded)
                 {
                     var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    string ActionLink = Url.Action("ConfirmEmail", "Register", new { id = user.Id, token = token }, Request.Scheme);
+                    string actionLink = Url.Action("ConfirmEmail", "Register", new { id = user.Id, token = token }, Request.Scheme);
                     string to = user.Email;
 
                     var mm = new MailMessage();
                     mm.To.Add(to);
-                    mm.Body = ActionLink;
+                    mm.Body = actionLink;
                     mm.Subject = "congrats";
                     mm.From = new MailAddress("mailforbusiness86@gmail.com");
                     mm.IsBodyHtml = false;
@@ -66,9 +66,7 @@ namespace ASPNETCOREAPP.Controllers
                     smtp.Send(mm);  
 
                     if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
-                    {
                         return RedirectToAction("ListUsers", "Administration");
-                    }
 
                     return RedirectToAction("Mail", "Login");
                 }

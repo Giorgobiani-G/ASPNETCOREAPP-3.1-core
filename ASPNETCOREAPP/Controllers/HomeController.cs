@@ -30,18 +30,17 @@ namespace ASPNETCOREAPP.Controllers
         {
             if (ModelState.IsValid)
             {
-                Listmodel lst = new Listmodel();
-                string photoName;
+                var list = new Listmodel();
 
                 if (model.Photo!=null)
                 {
                     var folderPath = Path.Combine(_hostingEnvironment.WebRootPath, "Images");
-                    photoName = Guid.NewGuid().ToString() + "_" + model.Photo.FileName;
+                    var photoName = Guid.NewGuid() + "_" + model.Photo.FileName;
                     var photoPath = Path.Combine(folderPath, photoName);
-                    lst.Photopath = photoName;
+                    list.Photopath = photoName;
                     model.Photo.CopyTo(new FileStream(photoPath, FileMode.Create));
-                    lst.Name = model.Name;
-                    _dataBase.Listmodels.Add(lst);
+                    list.Name = model.Name;
+                    _dataBase.Listmodels.Add(list);
                     _dataBase.SaveChanges();
                 }
             }
@@ -50,7 +49,7 @@ namespace ASPNETCOREAPP.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete( Listmodel id )
+        public async Task<IActionResult> Delete(Listmodel id)
         {
             var model = await _dataBase.Listmodels.FindAsync(id.ImageId);
             

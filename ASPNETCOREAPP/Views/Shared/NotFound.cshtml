@@ -1,16 +1,14 @@
-﻿
-@{ ViewData["Title"] = "Home Page"; }
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
 
 @if (ViewBag.ErrorMessage is null)
 {
-<h1>Not Found</h1>
- }
+    <h1>Not Found</h1>
+}
 
-           
 else
 
 {
-
-<h1>@ViewBag.ErrorMessage</h1>
-
+    <h1>@ViewBag.ErrorMessage</h1>
 }
