@@ -1,57 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ASPNETCOREAPP.Models;
 using Microsoft.AspNetCore.DataProtection;
 using ASPNETCOREAPP.Security;
+using static System.String;
 
 namespace ASPNETCOREAPP.Controllers
 {
-    public class EmploeeModelsController : Controller
+    public class EmployeeController : Controller
     {
         private readonly DatabaseContext _context;
-        private readonly IDataProtector protector;
-        public EmploeeModelsController(DatabaseContext context,
+        private readonly IDataProtector _protector;
+        public EmployeeController(DatabaseContext context,
             IDataProtectionProvider dataProtectionProvider,
             DataProtectionPurposeStrings dataProtectionPurposeStrings)
         {
-
             _context = context;
-            protector = dataProtectionProvider.CreateProtector(dataProtectionPurposeStrings.EmployeeIdRouteValue);
+            _protector = dataProtectionProvider.CreateProtector(dataProtectionPurposeStrings.EmployeeIdRouteValue);
         }
         
 
-        // GET: EmploeeModels
-        public async Task<IActionResult> Index(string SearchText)
+        public async Task<IActionResult> Index(string searchText)
         {
-            var Emploees = from em in _context.Emploees
+            var employees = from em in _context.Emploees
                        select em;
 
-            foreach (var item in Emploees)
+            foreach (var item in employees)
             {
-                item.EncryptedId = protector.Protect(item.Id.ToString());
+                item.EncryptedId = _protector.Protect(item.Id.ToString());
             }
 
-            if (!String.IsNullOrEmpty(SearchText))
+            if (!IsNullOrEmpty(searchText))
             {
-
-                Emploees = Emploees.Where(n => n.Name.Contains(SearchText) || n.Surname.Contains(SearchText) || (n.Name + " " + n.Surname).Contains(SearchText)|| (n.Surname + " " + n.Name).Contains(SearchText));
-                return View(await Emploees.ToListAsync());
+                employees = employees.Where(n => n.Name.Contains(searchText) || n.Surname.Contains(searchText) || (n.Name + " " + n.Surname).Contains(searchText)|| (n.Surname + " " + n.Name).Contains(searchText));
+                return View(await employees.ToListAsync());
             }
-            else {
-                
-                return View(await _context.Emploees.ToListAsync());
 
-            }
+            return View(await _context.Emploees.ToListAsync());
         }
 
-        
-
-        // GET: EmploeeModels/Create
         public IActionResult Create()
         {
             return View();
@@ -62,7 +52,7 @@ namespace ASPNETCOREAPP.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(EmploeeModel emploeeModel)
+        public async Task<IActionResult> Create(EmploeeModel employModel)
         {
             
             if (ModelState.IsValid)
@@ -70,30 +60,30 @@ namespace ASPNETCOREAPP.Controllers
 
                 
                 bool checkmail = (from email in _context.Emploees
-                                  where email.Email == emploeeModel.Email
+                                  where email.Email == employModel.Email
                                   select email).Any();
                 
 
                 var checkid = (from id in _context.Emploees
-                                where id.Empid == emploeeModel.Empid
+                                where id.Empid == employModel.Empid
                                 select id).Count();
                 if (checkmail)
                 {
                     
                     ViewBag.Message = "Aseti Meilit Registrirebuli tanamshromeli ukve arsebobs";
-                    return View(emploeeModel);
+                    return View(employModel);
                 }
                 
                 if (checkid>0)
                 {
                     ViewBag.Message = "Aseti tanamshromeli ukve arsebobs";
-                    return View(emploeeModel);
+                    return View(employModel);
                 }
 
 
 
                 ViewBag.Message = "tanamshromeli Warmatebit Damaemata";
-                _context.Add(emploeeModel);
+                _context.Add(employModel);
                 
                 await _context.SaveChangesAsync();
 
@@ -102,7 +92,7 @@ namespace ASPNETCOREAPP.Controllers
                 
             }
             
-            return View(emploeeModel);
+            return View(employModel);
             
         }
 
@@ -114,7 +104,7 @@ namespace ASPNETCOREAPP.Controllers
             {
                 return NotFound();
             }
-            string decryptedId = protector.Unprotect(id);
+            string decryptedId = _protector.Unprotect(id);
             int decryptedIntId = Convert.ToInt32(decryptedId);
             
 
@@ -124,7 +114,7 @@ namespace ASPNETCOREAPP.Controllers
                 return NotFound();
             }
 
-            EmploeeModel emploeeModela = new EmploeeModel
+            EmploeeModel model = new EmploeeModel
             {
                 Email = emploeeModel.Email,
                 EncryptedId = id,
@@ -139,47 +129,41 @@ namespace ASPNETCOREAPP.Controllers
                 Posti = emploeeModel.Posti
             };
 
-            return View(emploeeModela);
+            return View(model);
         }
 
-        // POST: EmploeeModels/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        
         [HttpPost]
         
-        public async Task<IActionResult> Edit(EmploeeModel emploeeModel)
+        public async Task<IActionResult> Edit(EmploeeModel employeeModel)
         {
-            if (emploeeModel.EncryptedId==null)
+            if (employeeModel.EncryptedId==null)
             {
                 return NotFound();
             }
-            string decryptedId = protector.Unprotect(emploeeModel.EncryptedId);
+            string decryptedId = _protector.Unprotect(employeeModel.EncryptedId);
             int decryptedIntId = Convert.ToInt32(decryptedId);
 
            if (ModelState.IsValid)
             {
                 try
                 {
-                    var checkmail = (from email in _context.Emploees
-                                      where email.Email == emploeeModel.Email&& email.Id!= decryptedIntId
+                    var checkMail = (from email in _context.Emploees
+                                      where email.Email == employeeModel.Email&& email.Id!= decryptedIntId
                                      select email).Any();
 
+                    var checkid = (from emps in _context.Emploees
+                                   where emps.Empid == employeeModel.Empid && emps.Id != decryptedIntId
+                                   select emps).Any();
 
-                    var checkid = (from aidi in _context.Emploees
-                                   where aidi.Empid == emploeeModel.Empid && aidi.Id != decryptedIntId
-                                   select aidi).Any();
-
-                    if (checkid&& checkmail)
+                    if (checkid&& checkMail)
                     {
                         TempData["errormessageId"] = "Aseti tanamshromeli ukve arsebobs";
                         TempData["errormessageEmail"] = "Aseti Meilit Registrirebuli tanamshromeli ukve arsebobs";
                         return RedirectToAction(nameof(Edit));
                     }
 
-                    if (checkmail)
+                    if (checkMail)
                     {
-
                         TempData["errormessageEmail"] = "Aseti Meilit Registrirebuli tanamshromeli ukve arsebobs";
                        return RedirectToAction(nameof(Edit));
                     }
@@ -189,63 +173,59 @@ namespace ASPNETCOREAPP.Controllers
                         TempData["errormessageId"] = "Aseti tanamshromeli ukve arsebobs";
                         return RedirectToAction(nameof(Edit));
                     }
-                    //TempData value DOESNT become null if redirection occures.
 
-                    _context.Update(emploeeModel);
+                    _context.Update(employeeModel);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EmploeeModelExists(decryptedIntId))
+                    if (!EmployeeModelExists(decryptedIntId))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(emploeeModel);
+            return View(employeeModel);
         }
 
-        // GET: EmploeeModels/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-            string decryptedId = protector.Unprotect(id);
-            int decryptedIntId = Convert.ToInt32(decryptedId);
 
+            var decryptedId = _protector.Unprotect(id);
 
-            var emploeeModel = await _context.Emploees
+            var decryptedIntId = Convert.ToInt32(decryptedId);
+
+            var employModel = await _context.Emploees
                 .FirstOrDefaultAsync(m => m.Id == decryptedIntId);
-            if (emploeeModel == null)
+            if (employModel == null)
             {
                 return NotFound();
             }
 
-            return View(emploeeModel);
+            return View(employModel);
         }
 
-        // POST: EmploeeModels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            string decryptedId = protector.Unprotect(id);
+            string decryptedId = _protector.Unprotect(id);
             int decryptedIntId = Convert.ToInt32(decryptedId);
 
-            var emploeeModel = await _context.Emploees.FindAsync(decryptedIntId);
-            _context.Emploees.Remove(emploeeModel);
+            var model = await _context.Emploees.FindAsync(decryptedIntId);
+            _context.Emploees.Remove(model);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool EmploeeModelExists(int id)
+        private bool EmployeeModelExists(int id)
         {
             return _context.Emploees.Any(e => e.Id == id);
         }

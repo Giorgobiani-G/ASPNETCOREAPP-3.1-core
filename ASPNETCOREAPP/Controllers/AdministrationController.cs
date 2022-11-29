@@ -12,18 +12,17 @@ namespace ASPNETCOREAPP.Controllers
 {
     public class AdministrationController : Controller
     {
-        private readonly RoleManager<IdentityRole> rolemanager;
-        private readonly UserManager<ApplicationUserc> userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AdministrationController(RoleManager<IdentityRole> rolemanager, UserManager<ApplicationUserc> userManager)
+        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
         {
-            this.rolemanager = rolemanager;
-            this.userManager = userManager;
+            _roleManager = roleManager;
+            _userManager = userManager;
         }
 
         public IActionResult CreateRole()
         {
-
             return View();
         }
 
@@ -40,7 +39,7 @@ namespace ASPNETCOREAPP.Controllers
                 };
 
                 // Saves the role in the underlying AspNetRoles table
-                IdentityResult result = await rolemanager.CreateAsync(identityRole);
+                IdentityResult result = await _roleManager.CreateAsync(identityRole);
 
                 if (result.Succeeded)
                 {
@@ -60,7 +59,7 @@ namespace ASPNETCOREAPP.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult ListRoles()
         {
-            var roles = rolemanager.Roles;
+            var roles = _roleManager.Roles;
 
             return View(roles);
         }
@@ -68,24 +67,24 @@ namespace ASPNETCOREAPP.Controllers
         [HttpGet]
         public IActionResult ListUsers()
         {
-            var users = userManager.Users;
+            var users = _userManager.Users;
             return View(users);
         }
 
         [HttpGet]
         public async Task<IActionResult> EditUser(string id)
         {
-            var user = await userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return View("NotFound");
             }
 
             // GetClaimsAsync retunrs the list of user Claims
-            var userClaims = await userManager.GetClaimsAsync(user);
+            var userClaims = await _userManager.GetClaimsAsync(user);
 
             // GetRolesAsync returns the list of user Roles
-            var userRoles = await userManager.GetRolesAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(user);
 
             var model = new EditUserViewModel
             {
@@ -104,7 +103,7 @@ namespace ASPNETCOREAPP.Controllers
         [HttpPost]
         public async Task<IActionResult> EditUser(EditUserViewModel model)
         {
-            var user = await userManager.FindByIdAsync(model.Id);
+            var user = await _userManager.FindByIdAsync(model.Id);
 
             if (user == null)
             {
@@ -117,7 +116,7 @@ namespace ASPNETCOREAPP.Controllers
                 user.Name = model.UserName;
                 user.Surname = model.Surname;
 
-                var result = await userManager.UpdateAsync(user);
+                var result = await _userManager.UpdateAsync(user);
 
                 if (result.Succeeded)
                 {
@@ -136,29 +135,27 @@ namespace ASPNETCOREAPP.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = await userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(id);
 
             if (user == null)
             {
                 ViewBag.ErrorMessage = $"User with Id = {id} cannot be found";
                 return View("NotFound");
             }
-            else
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (result.Succeeded)
             {
-                var result = await userManager.DeleteAsync(user);
-
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("ListUsers");
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
-
-                return View("ListUsers");
+                return RedirectToAction("ListUsers");
             }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+
+            return View("ListUsers");
         }
 
 
@@ -166,7 +163,7 @@ namespace ASPNETCOREAPP.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditRole(string id)
         {
-            var role = await rolemanager.FindByIdAsync(id);
+            var role = await _roleManager.FindByIdAsync(id);
 
             if (role == null)
             {
@@ -180,9 +177,9 @@ namespace ASPNETCOREAPP.Controllers
                 RoleName = role.Name
             };
 
-            foreach (var user in userManager.Users)
+            foreach (var user in _userManager.Users)
             {
-                if (await userManager.IsInRoleAsync(user, role.Name))
+                if (await _userManager.IsInRoleAsync(user, role.Name))
                 {
                     model.Users.Add(user.Email);
                 }
@@ -198,7 +195,7 @@ namespace ASPNETCOREAPP.Controllers
         public async Task<IActionResult> EditRole(EditRoleViewModel model)
 
         {
-            var role = await rolemanager.FindByIdAsync(model.Id);
+            var role = await _roleManager.FindByIdAsync(model.Id);
 
 
             if (role == null)
@@ -209,7 +206,7 @@ namespace ASPNETCOREAPP.Controllers
             else
             {
                 role.Name = model.RoleName;
-                var result = await rolemanager.UpdateAsync(role);
+                var result = await _roleManager.UpdateAsync(role);
 
                 if (result.Succeeded)
                 {
@@ -236,7 +233,7 @@ namespace ASPNETCOREAPP.Controllers
         {
             ViewBag.roleId = Id;
 
-            var role = await rolemanager.FindByIdAsync(Id);
+            var role = await _roleManager.FindByIdAsync(Id);
 
             if (role == null)
             {
@@ -246,7 +243,7 @@ namespace ASPNETCOREAPP.Controllers
 
             var model = new List<UserRoleViewModel>();
 
-            foreach (var user in userManager.Users)
+            foreach (var user in _userManager.Users)
             {
                 var userRoleViewModel = new UserRoleViewModel
                 {
@@ -254,7 +251,7 @@ namespace ASPNETCOREAPP.Controllers
                     UserName = user.Email
                 };
 
-                if (await userManager.IsInRoleAsync(user, role.Name))
+                if (await _userManager.IsInRoleAsync(user, role.Name))
                 {
                     userRoleViewModel.IsSelected = true;
                 }
@@ -273,7 +270,7 @@ namespace ASPNETCOREAPP.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditUsersInRole(List<UserRoleViewModel> model, string Id)
         {
-            var role = await rolemanager.FindByIdAsync(Id);
+            var role = await _roleManager.FindByIdAsync(Id);
 
             if (role == null)
             {
@@ -283,17 +280,17 @@ namespace ASPNETCOREAPP.Controllers
 
             for (int i = 0; i < model.Count; i++)
             {
-                var user = await userManager.FindByIdAsync(model[i].UserId);
+                var user = await _userManager.FindByIdAsync(model[i].UserId);
 
                 IdentityResult result = null;
 
-                if (model[i].IsSelected && !(await userManager.IsInRoleAsync(user, role.Name)))
+                if (model[i].IsSelected && !(await _userManager.IsInRoleAsync(user, role.Name)))
                 {
-                    result = await userManager.AddToRoleAsync(user, role.Name);
+                    result = await _userManager.AddToRoleAsync(user, role.Name);
                 }
-                else if (!model[i].IsSelected && await userManager.IsInRoleAsync(user, role.Name))
+                else if (!model[i].IsSelected && await _userManager.IsInRoleAsync(user, role.Name))
                 {
-                    result = await userManager.RemoveFromRoleAsync(user, role.Name);
+                    result = await _userManager.RemoveFromRoleAsync(user, role.Name);
                 }
                 else
                 {
@@ -316,7 +313,7 @@ namespace ASPNETCOREAPP.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteRole(string id)
         {
-            var role = await rolemanager.FindByIdAsync(id);
+            var role = await _roleManager.FindByIdAsync(id);
 
             if (role == null)
             {
@@ -328,7 +325,7 @@ namespace ASPNETCOREAPP.Controllers
                 try
                 {
                     //throw new Exception();
-                    var result = await rolemanager.DeleteAsync(role);
+                    var result = await _roleManager.DeleteAsync(role);
 
                     if (result.Succeeded)
                     {
@@ -357,7 +354,7 @@ namespace ASPNETCOREAPP.Controllers
         {
             ViewBag.userId = userId;
 
-            var user = await userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
             {
@@ -368,7 +365,7 @@ namespace ASPNETCOREAPP.Controllers
 
             var model = new List<RoleUsersViewModel>();
 
-            foreach (var role in rolemanager.Roles)
+            foreach (var role in _roleManager.Roles)
             {
                 var userRolesViewModel = new RoleUsersViewModel
                 {
@@ -376,7 +373,7 @@ namespace ASPNETCOREAPP.Controllers
                     RoleName = role.Name
                 };
 
-                if (await userManager.IsInRoleAsync(user, role.Name))
+                if (await _userManager.IsInRoleAsync(user, role.Name))
                 {
                     userRolesViewModel.IsSelected = true;
                 }
@@ -393,7 +390,7 @@ namespace ASPNETCOREAPP.Controllers
         [HttpPost]
         public async Task<IActionResult> ManageRoles(List<RoleUsersViewModel> model, string userId)
         {
-            var user = await userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
             {
@@ -401,9 +398,9 @@ namespace ASPNETCOREAPP.Controllers
                 return View("NotFound");
             }
 
-            var roles = await userManager.GetRolesAsync(user);
-            var result = await userManager.RemoveFromRolesAsync(user, roles);
-            result = await userManager.AddToRolesAsync(user, model.Where(x => x.IsSelected).Select(y => y.RoleName));
+            var roles = await _userManager.GetRolesAsync(user);
+            var result = await _userManager.RemoveFromRolesAsync(user, roles);
+            result = await _userManager.AddToRolesAsync(user, model.Where(x => x.IsSelected).Select(y => y.RoleName));
 
 
             if (!result.Succeeded)
@@ -413,7 +410,6 @@ namespace ASPNETCOREAPP.Controllers
             }
 
             return RedirectToAction("EditUser", new { Id = userId });
-
         }
     }
 }

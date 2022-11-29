@@ -1,9 +1,13 @@
 ﻿@model ASPNETCOREAPP.Models.EmploeeModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Create";
 }
-@*<head>
+
+<head>
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+
     @if (ViewBag.Message != null)
     {
 
@@ -22,10 +26,11 @@
 
         </script>
     }
+</head>
 
+<h1>Create</h1>
 
-</head>*@
-
+<h4>EmploeeModel</h4>
 
 <style>
     /* Chrome, Safari, Edge, Opera */
@@ -41,26 +46,14 @@
     }
 </style>
 
-<h1>Edit</h1>
-
-<h4>EmploeeModel</h4>
-<p style="color: red" style="font-weight: bold">@TempData["errormessageEmail"]</p>
-<p style="color: red" style="font-weight: bold">@TempData["errormessageId"]</p>
-
-
+<hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit" method="post">
+        <form asp-action="Create" id="fo">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <input type="hidden" asp-for="Id" value="@Model.Id" />
-                <input type="hidden" asp-for="EncryptedId" />
-
-            </div>
-            
-            <div class="form-group">
                 <label asp-for="Empid" class="control-label"></label>
-                <input asp-for="Empid" class="form-control" />
+                <input type="number" asp-for="Empid" class="form-control" />
                 <span asp-validation-for="Empid" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -77,7 +70,7 @@
                 <label asp-for="Gender" class="control-label"></label>
 
                 <select asp-for="Gender" class="form-control">
-                    <option value="Male" selected>Male</option>
+                    <option  value="male" selected="selected">Male</option>
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
                 </select>
@@ -90,11 +83,10 @@
             </div>
             <div class="form-group">
                 <label asp-for="Email" class="control-label">Email </label>
-                <div class="form-group">
-                    <input asp-for="Email" class="form-control">
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
+                <input asp-for="Email" class="form-control">
+                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Posti" class="control-label"></label>
                 <input asp-for="Posti" class="form-control" />
@@ -102,8 +94,11 @@
             </div>
             <div class="form-group">
                 <label asp-for="Statusi" class="control-label"></label>
-                <input asp-for="Statusi" class="form-control" />
-                <span asp-validation-for="Statusi" class="text-danger"></span>
+                <select asp-for="Statusi" class="form-control">
+                    <option value="Shtatshia" selected="selected">Shtatshia</option>
+                    <option value="Shtatgaresje">Shtatgaresje</option>
+                    <option value="Gantavisuflebuli">Gantavisuflebuli</option>
+                </select>
             </div>
             <div class="form-group">
                 <label asp-for="DateofFire" class="control-label"></label>
@@ -111,7 +106,7 @@
                 <span asp-validation-for="DateofFire" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input id="but" type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>

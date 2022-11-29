@@ -1,12 +1,8 @@
 ﻿using ASPNETCOREAPP.Models;
-using ASPNETCOREAPP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -16,8 +12,8 @@ namespace ASPNETCOREAPP.Controllers
     public class LoginController : Controller
     {
         private readonly DatabaseContext db;
-        private readonly SignInManager<ApplicationUserc> signInManager;
-        private readonly UserManager<ApplicationUserc> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly UserManager<ApplicationUser> userManager;
 
         public IActionResult Mail ()
         {
@@ -31,7 +27,7 @@ namespace ASPNETCOREAPP.Controllers
         }
 
         
-        public LoginController(SignInManager<ApplicationUserc> signInManager, DatabaseContext ddb,UserManager<ApplicationUserc> userManager)
+        public LoginController(SignInManager<ApplicationUser> signInManager, DatabaseContext ddb,UserManager<ApplicationUser> userManager)
         {
             this.signInManager = signInManager;
             db = ddb;
@@ -56,13 +52,9 @@ namespace ASPNETCOREAPP.Controllers
         public async Task<IActionResult> Login(LoginModel model)
         {
             if (ModelState.IsValid)
-            {
-                
-                
+            {   
                 try
-                {
-
-                    
+                {                  
                     var user = (from users in db.Users
                                 where users.Email == model.Email&& users.Password == model.Password
                                 select users).FirstOrDefault();
@@ -77,24 +69,20 @@ namespace ASPNETCOREAPP.Controllers
                     {
                         ModelState.AddModelError(string.Empty, "Email not confirmed yet");
                         return View(model);
-
                     }
                     
                     var result = await signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                     if (result.Succeeded)
-                    {
-                       
+                    {             
                         return RedirectToAction("Index", "Home");
                     }
 
                 }
                 catch (InvalidOperationException  ex)
                 {
-                    // the user is not exist
-                }
-            
-                
+                   
+                }           
             }
 
             return View(model);
@@ -128,7 +116,6 @@ namespace ASPNETCOREAPP.Controllers
                     
                     var token = await userManager.GeneratePasswordResetTokenAsync(user);
 
-                  
                     var passwordResetLink = Url.Action("ResetPassword", "Login",
                             new { email = model.Email, token = token }, Request.Scheme);
 
@@ -185,8 +172,6 @@ namespace ASPNETCOREAPP.Controllers
 
                 if (user != null)
                 {
-                   
-                    
                     // reset the user password
                     var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
                     
@@ -211,7 +196,5 @@ namespace ASPNETCOREAPP.Controllers
             // Display validation errors if model state is not valid
             return View(model);
         }
-
-
     }
 }

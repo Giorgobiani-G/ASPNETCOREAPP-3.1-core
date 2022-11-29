@@ -10,23 +10,14 @@ namespace ASPNETCOREAPP.Models
 {
     public class Listmodel
     {
-
-        //public List<string> lst = new List<string>()
-        //{
-        //     "sisharp",
-        //         "java",
-        //         "pyton"
-
-        //};
         [Key]
         public int ImageId { get; set; }
+
         public string Name { get; set; }
+        
         [NotMapped]
         public IFormFile Photo { get; set; }
 
         public string Photopath { get; set; }
-
-
-
     }
 }

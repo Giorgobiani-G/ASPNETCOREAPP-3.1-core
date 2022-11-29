@@ -12,15 +12,13 @@
     <a asp-action="Create">Create New</a>
 </p>
 
-<form asp-controller="EmploeeModels" asp-action="Index" method="post">
+<form asp-controller="Employee" asp-action="Index" method="post">
     <p>
-        <input type="text" name="SearchText">
+        <input type="text" name="searchText">
         <input type="submit" value="Search" />
         <a asp-action="Index">Back To Full List</a>
     </p>
 </form>
-
-
 
 
 <table class="table">

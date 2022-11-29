@@ -10,17 +10,13 @@ namespace ASPNETCOREAPP.Controllers
     public class RegisterController : Controller
 
     {
-        private readonly UserManager<ApplicationUserc> userManager;
-        private readonly SignInManager<ApplicationUserc> signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-
-
-        public RegisterController(UserManager<ApplicationUserc> userManager,
-            SignInManager<ApplicationUserc> signInManager)
+        public RegisterController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
 
@@ -31,36 +27,36 @@ namespace ASPNETCOREAPP.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(ApplicationUserc model)
+        public async Task<IActionResult> Register(ApplicationUser model)
         {
-
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUserc
+                var user = new ApplicationUser
                 {
-                    Name = model.Name.ToString(),
+                    Name = model.Name,
                     Surname = model.Surname,
                     UserName = model.UserName,
                     DateofBirth = model.DateofBirth,
                     Gender = model.Gender,
                     Email = model.Email,
                     Password = model.Password
-
                 };
-                var result = await userManager.CreateAsync(user, model.Password);
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+
                 if (result.Succeeded)
                 {
-                    var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     string ActionLink = Url.Action("ConfirmEmail", "Register", new { id = user.Id, token = token }, Request.Scheme);
                     string to = user.Email;
 
-                    MailMessage mm = new MailMessage();
+                    var mm = new MailMessage();
                     mm.To.Add(to);
                     mm.Body = ActionLink;
                     mm.Subject = "congrats";
                     mm.From = new MailAddress("mailforbusiness86@gmail.com");
                     mm.IsBodyHtml = false;
-                    SmtpClient smtp = new SmtpClient("smtp.gmail.com");
+                    var smtp = new SmtpClient("smtp.gmail.com");
                     
                     smtp.Port = 587;
                     smtp.UseDefaultCredentials = false;
@@ -69,15 +65,13 @@ namespace ASPNETCOREAPP.Controllers
                  
                     smtp.Send(mm);  
 
-                    if (signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                    if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                     {
                         return RedirectToAction("ListUsers", "Administration");
                     }
 
-                     
                     return RedirectToAction("Mail", "Login");
-
-                 }
+                }
 
                 foreach (var error in result.Errors)
                 {
@@ -90,32 +84,29 @@ namespace ASPNETCOREAPP.Controllers
 
 
         public async Task<IActionResult> ConfirmEmail(string id, string token)
-
         {
             if (id == null|| token==null)
             {
                 return RedirectToAction("Home", "Index");
             }
-            var user = await userManager.FindByIdAsync(id);
+
+            var user = await _userManager.FindByIdAsync(id);
             if (user==null)
             {
                 ViewBag.ErrorMessage = $"Incoming User ID {id} is invalid";
                 return View("NotFound");
             }
-            var result = await userManager.ConfirmEmailAsync(user, token);
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
 
             if (result.Succeeded)
             {
-
                 return View();
             }
+
             ViewBag.ErrorMessage = "Email Can't be Confirmed";
+
             return View("NotFound");
-
-            
-          
         }
-
-
     }
 }

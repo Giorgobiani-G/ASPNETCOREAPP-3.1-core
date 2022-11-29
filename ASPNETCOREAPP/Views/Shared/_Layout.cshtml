@@ -1,5 +1,5 @@
-﻿@inject SignInManager<ApplicationUserc> applicationuser;
-@inject UserManager<ApplicationUserc> UserManager;
+﻿@inject SignInManager<ApplicationUser> applicationuser;
+@inject UserManager<ApplicationUser> UserManager;
 
 
 <!DOCTYPE html>
@@ -47,7 +47,7 @@
                         {
                             <a class="navbar-brand text-white" asp-area="" asp-controller="Home" asp-action="Index">ASPNETCOREAPP</a>
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-action="index" asp-controller="EmploeeModels">Home</a>
+                                <a class="nav-link text-white" asp-area="" asp-action="index" asp-controller="Employee">Home</a>
                             </li>
                             if (User.IsInRole("Admin"))
                             {

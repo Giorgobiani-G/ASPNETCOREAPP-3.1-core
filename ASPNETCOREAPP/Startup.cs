@@ -39,7 +39,7 @@ namespace WebApplication1
 
             
 
-            services.AddIdentity<ApplicationUserc, IdentityRole>(op=> { op.SignIn.RequireConfirmedEmail = true;}).AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders().AddErrorDescriber<CustomIdentityErrorDescriber>();
+            services.AddIdentity<ApplicationUser, IdentityRole>(op=> { op.SignIn.RequireConfirmedEmail = true;}).AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders().AddErrorDescriber<CustomIdentityErrorDescriber>();
             
             //Add Email uniqueness
             services.Configure<IdentityOptions>(options =>

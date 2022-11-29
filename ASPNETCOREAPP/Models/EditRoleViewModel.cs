@@ -18,7 +18,5 @@ namespace ASPNETCOREAPP.Models
         public string RoleName { get; set; }
 
         public List<string> Users { get; set; }
-
-
     }
 }

@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ASPNETCOREAPP.Models
 {
     public class EditUserViewModel
     {
-       
             public EditUserViewModel()
             {
                 Claims = new List<string>();
@@ -25,7 +21,6 @@ namespace ASPNETCOREAPP.Models
             public string Email { get; set; }
 
             public string Surname { get; set; }
-
 
             public List<string> Claims { get; set; }
 
