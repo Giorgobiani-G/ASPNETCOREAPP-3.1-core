@@ -27,19 +27,18 @@ namespace WebApplication1
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
-                
+
             });
-            
+
             services.AddDbContextPool<DatabaseContext>(options =>
             options.UseSqlServer(_configuration.GetConnectionString("EmployeeDBConnection")));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>(op=> { op.SignIn.RequireConfirmedEmail = true;}).AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders().AddErrorDescriber<CustomIdentityErrorDescriber>();
-            
-            services.Configure<IdentityOptions>(options =>
+            services.AddIdentity<ApplicationUser, IdentityRole>(op =>
             {
-                options.User.RequireUniqueEmail = true;
-                
-            });
+                op.SignIn.RequireConfirmedEmail = true;
+                op.User.RequireUniqueEmail = true;
+
+            }).AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders().AddErrorDescriber<CustomIdentityErrorDescriber>();
 
             services.AddRazorPages().AddMvcOptions(opt => opt.EnableEndpointRouting = false);
 
