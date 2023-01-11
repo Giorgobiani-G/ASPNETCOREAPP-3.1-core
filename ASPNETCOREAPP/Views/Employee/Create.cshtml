@@ -5,7 +5,6 @@
 }
 
 <head>
-
     <script src="~/lib/jquery/dist/jquery.js"></script>
 
     @if (ViewBag.Message != null)
@@ -16,7 +15,6 @@
                        alert("@ViewBag.Message");
                        $('input[class="form-control"]').each(function () {
                            $(this).val("")
-
                        });
                        $('select').each(function () {
                            $(this).val($(this).find("option[selected]").val())

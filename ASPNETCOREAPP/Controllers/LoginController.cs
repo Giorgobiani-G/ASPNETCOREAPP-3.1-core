@@ -106,10 +106,9 @@ namespace ASPNETCOREAPP.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-
+               
                 if (user != null && await _userManager.IsEmailConfirmedAsync(user))
                 {
-
                     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
                     var passwordResetLink = Url.Action("ResetPassword", "Login",
