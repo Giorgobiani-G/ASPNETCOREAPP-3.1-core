@@ -53,20 +53,21 @@ namespace ASPNETCOREAPP.Controllers
                     var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     string actionLink = Url.Action("ConfirmEmail", "Register", new { id = user.Id, token = token }, Request.Scheme);
                     string to = user.Email;
-
+                   
                     var mm = new MailMessage();
                     mm.To.Add(to);
                     mm.Body = actionLink;
                     mm.Subject = "congrats";
                     mm.From = new MailAddress("mailforbusiness86@gmail.com");
                     mm.IsBodyHtml = false;
-                    var smtp = new SmtpClient("smtp.gmail.com");
-                    
-                    smtp.Port = 587;
-                    smtp.UseDefaultCredentials = false;
-                    smtp.EnableSsl = true;
-                    smtp.Credentials = new System.Net.NetworkCredential("mailforbusiness86@gmail.com", "Safrangeti@1986");
-                 
+                    var smtp = new SmtpClient("smtp.gmail.com")
+                    {
+                        Port = 587,
+                        UseDefaultCredentials = false,
+                        EnableSsl = true,
+                        Credentials = new System.Net.NetworkCredential("mailforbusiness86@gmail.com", "Safrangeti@1986")
+                    };
+
                     smtp.Send(mm);  
 
                     if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))

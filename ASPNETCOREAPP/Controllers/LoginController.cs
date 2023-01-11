@@ -123,12 +123,13 @@ namespace ASPNETCOREAPP.Controllers
                     mm.Subject = "Reset Password";
                     mm.From = new MailAddress("mailforbusiness86@gmail.com");
                     mm.IsBodyHtml = false;
-                    var smtp = new SmtpClient("smtp.gmail.com");
-
-                    smtp.Port = 587;
-                    smtp.UseDefaultCredentials = false;
-                    smtp.EnableSsl = true;
-                    smtp.Credentials = new System.Net.NetworkCredential("mailforbusiness86@gmail.com", "Safrangeti@1986");
+                    var smtp = new SmtpClient("smtp.gmail.com")
+                    {
+                        Port = 587,
+                        UseDefaultCredentials = false,
+                        EnableSsl = true,
+                        Credentials = new System.Net.NetworkCredential("mailforbusiness86@gmail.com", "Safrangeti@1986")
+                    };
 
                     smtp.Send(mm);
 

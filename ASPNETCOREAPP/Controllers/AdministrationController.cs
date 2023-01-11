@@ -181,7 +181,6 @@ namespace ASPNETCOREAPP.Controllers
             }
 
             return View(model);
-
         }
 
         [HttpPost]
@@ -330,6 +329,7 @@ namespace ASPNETCOREAPP.Controllers
                 ViewBag.ErrorTitle = $"{role.Name} role is in use";
                 ViewBag.ErrorMessage = $"{role.Name} role cant be deleted as there are users in this role, " +
                                        $"If you want to delete this role, please romeve the users from the role and then try to delete";
+
                 return View("Error");
             }
         }

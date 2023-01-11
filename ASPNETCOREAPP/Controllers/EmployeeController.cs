@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ASPNETCOREAPP.Models;
+using ASPNETCOREAPP.Security;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ASPNETCOREAPP.Models;
-using Microsoft.AspNetCore.DataProtection;
-using ASPNETCOREAPP.Security;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using static System.String;
 
 namespace ASPNETCOREAPP.Controllers
@@ -21,12 +21,12 @@ namespace ASPNETCOREAPP.Controllers
             _context = context;
             _protector = dataProtectionProvider.CreateProtector(dataProtectionPurposeStrings.EmployeeIdRouteValue);
         }
-        
+
 
         public async Task<IActionResult> Index(string searchText)
         {
             var employees = from em in _context.Emploees
-                       select em;
+                            select em;
 
             foreach (var item in employees)
             {
@@ -35,7 +35,7 @@ namespace ASPNETCOREAPP.Controllers
 
             if (!IsNullOrEmpty(searchText))
             {
-                employees = employees.Where(n => n.Name.Contains(searchText) || n.Surname.Contains(searchText) || (n.Name + " " + n.Surname).Contains(searchText)|| (n.Surname + " " + n.Name).Contains(searchText));
+                employees = employees.Where(n => n.Name.Contains(searchText) || n.Surname.Contains(searchText) || (n.Name + " " + n.Surname).Contains(searchText) || (n.Surname + " " + n.Name).Contains(searchText));
                 return View(await employees.ToListAsync());
             }
 
@@ -51,46 +51,36 @@ namespace ASPNETCOREAPP.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(EmploeeModel employModel)
         {
-            
             if (ModelState.IsValid)
             {
-
-                
-                bool checkmail = (from email in _context.Emploees
-                                  where email.Email == employModel.Email
-                                  select email).Any();
-                
+                bool checkEmail = (from email in _context.Emploees
+                                   where email.Email == employModel.Email
+                                   select email).Any();
 
                 var checkid = (from id in _context.Emploees
-                                where id.Empid == employModel.Empid
-                                select id).Count();
-                if (checkmail)
+                               where id.Empid == employModel.Empid
+                               select id).Count();
+                if (checkEmail)
                 {
-                    
                     ViewBag.Message = "Aseti Meilit Registrirebuli tanamshromeli ukve arsebobs";
                     return View(employModel);
                 }
-                
-                if (checkid>0)
+
+                if (checkid > 0)
                 {
                     ViewBag.Message = "Aseti tanamshromeli ukve arsebobs";
                     return View(employModel);
                 }
 
-
-
                 ViewBag.Message = "tanamshromeli Warmatebit Damaemata";
                 _context.Add(employModel);
-                
+
                 await _context.SaveChangesAsync();
 
-                //return RedirectToAction(nameof(Index));
-
-                
+                //return RedirectToAction(nameof(Index));                
             }
-            
+
             return View(employModel);
-            
         }
 
         [HttpGet]
@@ -104,7 +94,6 @@ namespace ASPNETCOREAPP.Controllers
             var decryptedId = _protector.Unprotect(id);
 
             var decryptedIntId = Convert.ToInt32(decryptedId);
-            
 
             var employeeModel = await _context.Emploees.FindAsync(decryptedIntId);
 
@@ -132,10 +121,10 @@ namespace ASPNETCOREAPP.Controllers
         }
 
         [HttpPost]
-        
+
         public async Task<IActionResult> Edit(EmploeeModel employeeModel)
         {
-            if (employeeModel.EncryptedId==null)
+            if (employeeModel.EncryptedId == null)
             {
                 return NotFound();
             }
@@ -144,32 +133,32 @@ namespace ASPNETCOREAPP.Controllers
 
             var decryptedIntId = Convert.ToInt32(decryptedId);
 
-           if (ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
-                    var checkMail = (from email in _context.Emploees
-                                      where email.Email == employeeModel.Email&& email.Id!= decryptedIntId
-                                     select email).Any();
+                    var checkEmail = (from email in _context.Emploees
+                                      where email.Email == employeeModel.Email && email.Id != decryptedIntId
+                                      select email).Any();
 
-                    var checkid = (from emps in _context.Emploees
+                    var checkId = (from emps in _context.Emploees
                                    where emps.Empid == employeeModel.Empid && emps.Id != decryptedIntId
                                    select emps).Any();
 
-                    if (checkid&& checkMail)
+                    if (checkId && checkEmail)
                     {
                         TempData["errormessageId"] = "Aseti tanamshromeli ukve arsebobs";
                         TempData["errormessageEmail"] = "Aseti Meilit Registrirebuli tanamshromeli ukve arsebobs";
                         return RedirectToAction(nameof(Edit));
                     }
 
-                    if (checkMail)
+                    if (checkEmail)
                     {
                         TempData["errormessageEmail"] = "Aseti Meilit Registrirebuli tanamshromeli ukve arsebobs";
-                       return RedirectToAction(nameof(Edit));
+                        return RedirectToAction(nameof(Edit));
                     }
 
-                    if (checkid)
+                    if (checkId)
                     {
                         TempData["errormessageId"] = "Aseti tanamshromeli ukve arsebobs";
                         return RedirectToAction(nameof(Edit));
