@@ -15,19 +15,17 @@ namespace ASPNETCOREAPP.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public IActionResult Mail ()
+        public IActionResult Mail()
         {
-
             ViewBag.ErrorTitle = "Registration successful";
             ViewBag.ErrorMessage = "Before you can Login, please confirm your " +
                     "email, by clicking on the confirmation link we have emailed you";
 
             return View();
-
         }
 
-        
-        public LoginController(SignInManager<ApplicationUser> signInManager, DatabaseContext db,UserManager<ApplicationUser> userManager)
+
+        public LoginController(SignInManager<ApplicationUser> signInManager, DatabaseContext db, UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
             _db = db;
@@ -51,37 +49,37 @@ namespace ASPNETCOREAPP.Controllers
         public async Task<IActionResult> Login(LoginModel model)
         {
             if (ModelState.IsValid)
-            {   
+            {
                 try
-                {                  
+                {
                     var user = (from users in _db.Users
-                                where users.Email == model.Email&& users.Password == model.Password
+                                where users.Email == model.Email && users.Password == model.Password
                                 select users).FirstOrDefault();
 
                     if (user == null)
                     {
                         ModelState.AddModelError("", "Invalid Mail Or Password");
-                        return View(model) ;
+                        return View(model);
                     }
 
-                    if (user!=null&&!user.EmailConfirmed&&(await _userManager.CheckPasswordAsync(user,model.Password)))
+                    if (user != null && !user.EmailConfirmed && (await _userManager.CheckPasswordAsync(user, model.Password)))
                     {
                         ModelState.AddModelError(string.Empty, "Email not confirmed yet");
                         return View(model);
                     }
-                    
+
                     var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                     if (result.Succeeded)
-                    {             
+                    {
                         return RedirectToAction("Index", "Home");
                     }
 
                 }
-                catch (InvalidOperationException  ex)
+                catch (InvalidOperationException ex)
                 {
-                   
-                }           
+
+                }
             }
 
             return View(model);
@@ -108,10 +106,10 @@ namespace ASPNETCOREAPP.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                
+
                 if (user != null && await _userManager.IsEmailConfirmedAsync(user))
                 {
-                    
+
                     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
                     var passwordResetLink = Url.Action("ResetPassword", "Login",
@@ -139,7 +137,6 @@ namespace ASPNETCOREAPP.Controllers
 
                 return View("ForgotPasswordConfirmation");
             }
-
             return View(model);
         }
 
@@ -167,12 +164,12 @@ namespace ASPNETCOREAPP.Controllers
                 {
                     // reset the user password
                     var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
-                    
+
                     if (result.Succeeded)
                     {
                         return View("ResetPasswordConfirmation");
                     }
-                    
+
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError("", error.Description);
@@ -182,7 +179,7 @@ namespace ASPNETCOREAPP.Controllers
 
                 return View("ResetPasswordConfirmation");
             }
-            
+
             return View(model);
         }
     }

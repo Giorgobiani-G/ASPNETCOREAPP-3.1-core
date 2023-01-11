@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ASPNETCOREAPP.Models
 {
@@ -23,7 +20,7 @@ namespace ASPNETCOREAPP.Models
         public string Gender { get; set; }
         [DataType(DataType.Date)]
         public DateTime DateofBirth { get; set; }
-        [Required(ErrorMessage ="The Email is required")]
+        [Required(ErrorMessage = "The Email is required")]
         public string Email { get; set; }
 
         public string Posti { get; set; }
@@ -31,7 +28,7 @@ namespace ASPNETCOREAPP.Models
         public string Statusi { get; set; }
         [DataType(DataType.Date)]
         //[Required(AllowEmptyStrings =false)]
-        
+
         public DateTime? DateofFire { get; set; }
     }
 }

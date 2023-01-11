@@ -13,7 +13,7 @@ namespace ASPNETCOREAPP.Controllers
         private readonly DatabaseContext _dataBase;
 
         private readonly IWebHostEnvironment _hostingEnvironment;
-        public HomeController(IWebHostEnvironment hostingEnvironment,DatabaseContext context)
+        public HomeController(IWebHostEnvironment hostingEnvironment, DatabaseContext context)
         {
             _hostingEnvironment = hostingEnvironment;
             _dataBase = context;
@@ -21,18 +21,17 @@ namespace ASPNETCOREAPP.Controllers
 
         public IActionResult Index()
         {
-           
             return View();
         }
 
         [HttpPost]
-        public IActionResult Index( Listmodel model)
+        public IActionResult Index(Listmodel model)
         {
             if (ModelState.IsValid)
             {
                 var list = new Listmodel();
 
-                if (model.Photo!=null)
+                if (model.Photo != null)
                 {
                     var folderPath = Path.Combine(_hostingEnvironment.WebRootPath, "Images");
                     var photoName = Guid.NewGuid() + "_" + model.Photo.FileName;
@@ -52,7 +51,7 @@ namespace ASPNETCOREAPP.Controllers
         public async Task<IActionResult> Delete(Listmodel id)
         {
             var model = await _dataBase.Listmodels.FindAsync(id.ImageId);
-            
+
             _dataBase.Listmodels.Remove(model);
             await _dataBase.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

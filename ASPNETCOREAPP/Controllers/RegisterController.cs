@@ -1,4 +1,5 @@
-﻿using System.Net.Mail;
+﻿using System;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ASPNETCOREAPP.Models;
@@ -19,7 +20,6 @@ namespace ASPNETCOREAPP.Controllers
             _signInManager = signInManager;
         }
 
-
         [HttpGet]
         public IActionResult Register()
         {
@@ -29,6 +29,10 @@ namespace ASPNETCOREAPP.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(ApplicationUser model)
         {
+            if (model.Password!=model.ConfirmPassword)
+            {
+                throw new Exception("Confirm password doesn't match the password!");
+            }
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser

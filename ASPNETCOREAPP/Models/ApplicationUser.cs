@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASPNETCOREAPP.Models
 {
@@ -27,7 +28,7 @@ namespace ASPNETCOREAPP.Models
         public string Password { get; set; }
         [Compare("Password",
             ErrorMessage = "Password and confirmation password do not match.")]
-        
+        [NotMapped]
         public string ConfirmPassword { get; set; }
     }
 }

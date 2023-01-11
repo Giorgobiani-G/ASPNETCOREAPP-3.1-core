@@ -6,7 +6,7 @@ namespace ASPNETCOREAPP.Models
 {
     public class DatabaseContext : IdentityDbContext<ApplicationUser>
     {
-        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options){}
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
 
         public DbSet<EmploeeModel> Emploees { get; set; }
         public DbSet<Listmodel> Listmodels { get; set; }
@@ -15,7 +15,7 @@ namespace ASPNETCOREAPP.Models
         {
             base.OnModelCreating(builder);
 
-            foreach (var foreignKey in builder.Model.GetEntityTypes().SelectMany(e=> e.GetForeignKeys()))
+            foreach (var foreignKey in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
                 foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
             }
