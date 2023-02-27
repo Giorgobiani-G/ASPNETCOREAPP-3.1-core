@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ASPNETCOREAPP.Models;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using System.Linq;
 
 namespace ASPNETCOREAPP.Controllers
 {
@@ -37,7 +37,12 @@ namespace ASPNETCOREAPP.Controllers
                     var photoName = Guid.NewGuid() + "_" + model.Photo.FileName;
                     var photoPath = Path.Combine(folderPath, photoName);
                     list.Photopath = photoName;
-                    model.Photo.CopyTo(new FileStream(photoPath, FileMode.Create));
+
+                    using (var fileStream = new FileStream(photoPath, FileMode.Create))
+                    {
+                        model.Photo.CopyTo(fileStream); 
+                    }
+
                     list.Name = model.Name;
                     _dataBase.Listmodels.Add(list);
                     _dataBase.SaveChanges();
@@ -48,19 +53,17 @@ namespace ASPNETCOREAPP.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(Listmodel id)
+        public async Task<IActionResult> Delete(Listmodel model)
         {
-            var model = await _dataBase.Listmodels.FindAsync(id.ImageId);
+            var entity = await _dataBase.Listmodels.FindAsync(model.ImageId);
 
-            _dataBase.Listmodels.Remove(model);
+                var photoPath = Path.Combine(_hostingEnvironment.WebRootPath, "Images", entity.Photopath);
+                FileInfo fileInfo = new FileInfo(photoPath);
+                fileInfo.Delete();
+
+            _dataBase.Listmodels.Remove(entity);
             await _dataBase.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
